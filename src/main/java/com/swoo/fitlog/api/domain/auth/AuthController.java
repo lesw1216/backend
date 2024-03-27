@@ -1,17 +1,21 @@
 package com.swoo.fitlog.api.domain.auth;
 
 import com.swoo.fitlog.api.domain.auth.dto.EmailDto;
+import com.swoo.fitlog.api.domain.auth.dto.OtpDto;
 import com.swoo.fitlog.api.domain.auth.service.MailSendService;
 import com.swoo.fitlog.api.domain.auth.service.OtpService;
-import com.swoo.fitlog.api.http.RestApiResponse;
+import com.swoo.fitlog.api.exception.ExpiredOtpException;
+import com.swoo.fitlog.api.http.ErrorResponse;
+import com.swoo.fitlog.api.http.RestResponse;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -31,26 +35,55 @@ public class AuthController {
 
         mailSendService.send(email);
 
-        RestApiResponse<Object> restApiResponse = RestApiResponse.builder()
+        RestResponse<Object> restResponse = RestResponse.builder()
                 .code(200)
                 .httpStatus(HttpStatus.OK)
                 .message("이메일 인증 번호 발송")
                 .build();
 
-        return new ResponseEntity<>(restApiResponse, HttpStatus.OK);
+        return new ResponseEntity<>(restResponse, HttpStatus.OK);
     }
 
     @GetMapping("/api/v1/auth/locals/email/expiration")
     public ResponseEntity<Object> sendExpirationTime(@RequestParam("email") String email) {
         Long expiration = otpService.getExpiration(email);
 
-        RestApiResponse<Object> restApiResponse = RestApiResponse.builder()
+        RestResponse<Object> restResponse = RestResponse.builder()
                 .code(200)
                 .httpStatus(HttpStatus.OK)
                 .message("유효 시간 획득 성공")
                 .data(expiration)
                 .build();
 
-        return new ResponseEntity<>(restApiResponse, HttpStatus.OK);
+        return new ResponseEntity<>(restResponse, HttpStatus.OK);
+    }
+
+    @PostMapping("/api/v1/auth/locals/email/otp")
+    public ResponseEntity<Object> certifyOtp(@RequestBody @Valid OtpDto otpDto) {
+        String otp = otpDto.getOtp();
+        String email = otpDto.getEmail();
+
+        try {
+            // 일치하지 않는 인증 번호
+            if (!otpService.verifyOTP(email, otp)) {
+                ErrorResponse errorResponse = ErrorResponse
+                        .of(400, HttpStatus.BAD_REQUEST, "예기치 않은 오류가 발생했습니다.", List.of(70));
+
+                return new ResponseEntity<>(errorResponse, errorResponse.getHttpStatus());
+            }
+
+        } catch (ExpiredOtpException e) {
+            // 만료된 인증 번호
+            ErrorResponse errorResponse = ErrorResponse
+                    .of(400, HttpStatus.BAD_REQUEST, "예기치 않은 오류가 발생했습니다.", List.of(71));
+
+            return new ResponseEntity<>(errorResponse, errorResponse.getHttpStatus());
+        }
+
+        // 인증 성공
+        RestResponse<Object> restResponse = RestResponse
+                .of(200, HttpStatus.OK, "이메일 인증 성공", null);
+
+        return new ResponseEntity<>(restResponse, restResponse.getHttpStatus());
     }
 }
