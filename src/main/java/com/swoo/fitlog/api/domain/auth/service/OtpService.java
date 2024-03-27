@@ -80,6 +80,7 @@ public class OtpService {
     private String generateOTP() {
         Random random = new Random();
         int otp = 100000 + random.nextInt(900000);  // 100000 ~ 999999 사이의 무작위 정수
+
         return String.valueOf(otp);
     }
 }

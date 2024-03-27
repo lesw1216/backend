@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class AuthController {
      */
     @PostMapping("/api/v1/auth/locals/email")
     public ResponseEntity<Object> receiveEmail(@Valid @RequestBody EmailDto emailDto) throws MessagingException {
+
         String email = emailDto.getEmail();
         log.debug("[E-mail]=[{}]", email);
 
