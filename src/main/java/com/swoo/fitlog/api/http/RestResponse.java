@@ -1,18 +1,23 @@
 package com.swoo.fitlog.api.http;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-@Setter
 @Builder
-@AllArgsConstructor
-public class RestApiResponse<T>{
-    private Integer code;
+public class RestResponse<T>{
+    private int code;
     private HttpStatus httpStatus;
     private String message;
     private T data;
+
+    public static RestResponse<Object> of(int code, HttpStatus httpStatus, String message, Object data) {
+        return RestResponse.builder()
+                .code(code)
+                .httpStatus(httpStatus)
+                .message(message)
+                .data(data)
+                .build();
+    }
 }
