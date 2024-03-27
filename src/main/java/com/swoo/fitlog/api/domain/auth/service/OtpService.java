@@ -34,6 +34,16 @@ public class OtpService {
         return otp.equals(savedOTP);
     }
 
+    public Long getExpiration(String email) {
+        String key = createKey(email);
+
+        return redisTemplate.getExpire(key, TimeUnit.SECONDS);
+    }
+
+    private String createKey(String email) {
+        return "OTP:" + email;
+    }
+
     private String generateOTP() {
         Random random = new Random();
         int otp = 100000 + random.nextInt(900000);
