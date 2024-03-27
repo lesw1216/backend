@@ -4,6 +4,8 @@ import com.swoo.fitlog.api.domain.auth.dto.EmailDto;
 import com.swoo.fitlog.api.domain.auth.dto.OtpDto;
 import com.swoo.fitlog.api.domain.auth.service.MailSendService;
 import com.swoo.fitlog.api.domain.auth.service.OtpService;
+import com.swoo.fitlog.api.domain.auth.service.PasswordAuthService;
+import com.swoo.fitlog.api.domain.user.dto.UserDto;
 import com.swoo.fitlog.api.exception.ExpiredOtpException;
 import com.swoo.fitlog.api.http.ErrorResponse;
 import com.swoo.fitlog.api.http.RestResponse;
@@ -25,6 +27,7 @@ public class AuthController {
 
     private final MailSendService mailSendService;
     private final OtpService otpService;
+    private final PasswordAuthService passwordAuthService;
 
     /*
         이메일 수신 후 인증 번호 발송
@@ -86,6 +89,18 @@ public class AuthController {
         RestResponse<Object> restResponse = RestResponse
                 .of(200, HttpStatus.OK, "이메일 인증 성공", null);
 
+        return new ResponseEntity<>(restResponse, restResponse.getHttpStatus());
+    }
+
+    @PostMapping("/api/v1/auth/locals/password")
+    public ResponseEntity<Object> verifyPassword(@RequestBody @Valid UserDto passwordDto) {
+        String email = passwordDto.getEmail();
+        String password = passwordDto.getPassword();
+
+        passwordAuthService.verifyPassword(email, password);
+
+        RestResponse<Object> restResponse =
+                RestResponse.of(200, HttpStatus.OK, "비밀 번호 검증 성공", null);
         return new ResponseEntity<>(restResponse, restResponse.getHttpStatus());
     }
 }
