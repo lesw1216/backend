@@ -16,7 +16,7 @@ public class OtpService {
 
     private static final Long EXPIRATION_TIME_MINUTES = 5L; // 유효 시간 5분
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Integer> redisTemplate;
 
     /*
     * 인증 번호 생성하고 저장
@@ -26,8 +26,8 @@ public class OtpService {
     * 3. redis에 KEY:OTP 저장
     * 4. 인증 번호 반환
     * */
-    public String generateAndSaveOTP(String email) {
-        String otp = generateOTP();
+    public int generateAndSaveOTP(String email) {
+        int otp = generateOTP();
         String key = createKey(email);
 
         redisTemplate.opsForValue().set(key, otp, EXPIRATION_TIME_MINUTES, TimeUnit.MINUTES);
@@ -44,9 +44,10 @@ public class OtpService {
     * 3. 인증 번호가 없는 경우(null) ExpiredOtpException 예외 발생
     * 4. 사용자가 입력한 인증 번호와 조회한 인증 번호 비교
     * */
-    public boolean verifyOTP(String email, String otp) {
+    public boolean verifyOTP(String email, int otp) {
         String key = createKey(email);
-        String savedOTP = redisTemplate.opsForValue().getAndDelete(key);
+
+        Integer savedOTP = redisTemplate.opsForValue().getAndDelete(key);
 
         /*
         * 현재 email에 대한 인증 번호가 존재하지 않았을 경우
@@ -55,7 +56,7 @@ public class OtpService {
             throw new ExpiredOtpException("만료된 인증 번호");
         }
 
-        return otp.equals(savedOTP);
+        return otp == savedOTP;
     }
 
     /*
@@ -77,10 +78,9 @@ public class OtpService {
     /*
     * 인증 번호 생성
     * */
-    private String generateOTP() {
+    private int generateOTP() {
         Random random = new Random();
-        int otp = 100000 + random.nextInt(900000);  // 100000 ~ 999999 사이의 무작위 정수
 
-        return String.valueOf(otp);
+        return 100000 + random.nextInt(900000);
     }
 }

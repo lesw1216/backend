@@ -18,7 +18,7 @@ class OtpServiceTest {
         String email = "abc@naver.com";
 
         // when
-        String otp = otpService.generateAndSaveOTP(email);
+        int otp = otpService.generateAndSaveOTP(email);
 
         // then
         Assertions.assertTrue(otpService.verifyOTP(email, otp));
@@ -31,6 +31,6 @@ class OtpServiceTest {
 
         // when
         // then
-        Assertions.assertThrows(ExpiredOtpException.class, () -> otpService.verifyOTP(email, "123456"));
+        Assertions.assertThrows(ExpiredOtpException.class, () -> otpService.verifyOTP(email, 123456));
     }
 }

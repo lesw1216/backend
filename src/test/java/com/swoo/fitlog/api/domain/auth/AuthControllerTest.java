@@ -36,7 +36,7 @@ class AuthControllerTest {
         String email = "test@gmail.com";
 
         // when
-        String otp = otpService.generateAndSaveOTP(email);
+        int otp = otpService.generateAndSaveOTP(email);
 
         OtpDto otpDto = new OtpDto();
         otpDto.setEmail(email);
@@ -61,7 +61,7 @@ class AuthControllerTest {
         String URI = "/api/v1/auth/locals/email/otp";
 
         OtpDto otpDto = new OtpDto();
-        otpDto.setOtp("123456");
+        otpDto.setOtp(123456);
         otpDto.setEmail("test1@gmail.com");
 
         String otpJson = objectMapper.writeValueAsString(otpDto);
@@ -83,7 +83,7 @@ class AuthControllerTest {
         String URI = "/api/v1/auth/locals/email/otp";
 
         OtpDto otpDto = new OtpDto();
-        otpDto.setOtp("123456");
+        otpDto.setOtp(123456);
         otpDto.setEmail("test2@gmail.com");
 
         String otpJson = objectMapper.writeValueAsString(otpDto);
@@ -91,7 +91,7 @@ class AuthControllerTest {
         // when
 
         // 직접 service로 임의의 이메일 인증 번호 생성
-        String otp = otpService.generateAndSaveOTP("test@gmail.com");
+        int otp = otpService.generateAndSaveOTP("test@gmail.com");
 
         // then
         mvc.perform(MockMvcRequestBuilders.post(URI)
@@ -109,7 +109,7 @@ class AuthControllerTest {
         String URI = "/api/v1/auth/locals/email/otp";
 
         OtpDto otpDto = new OtpDto();
-        otpDto.setOtp("123");
+        otpDto.setOtp(123);
         otpDto.setEmail("test2@gmail.com");
 
         String otpJson = objectMapper.writeValueAsString(otpDto);
@@ -117,7 +117,7 @@ class AuthControllerTest {
         // when
 
         // 직접 service로 임의의 이메일 인증 번호 생성
-        String otp = otpService.generateAndSaveOTP("test@gmail.com");
+        int otp = otpService.generateAndSaveOTP("test@gmail.com");
 
         // then
         mvc.perform(MockMvcRequestBuilders.post(URI)
@@ -135,7 +135,7 @@ class AuthControllerTest {
         String URI = "/api/v1/auth/locals/email/otp";
 
         OtpDto otpDto = new OtpDto();
-        otpDto.setOtp("");
+        otpDto.setOtp(0);
         otpDto.setEmail("test2@gmail.com");
 
         String otpJson = objectMapper.writeValueAsString(otpDto);
@@ -143,7 +143,7 @@ class AuthControllerTest {
         // when
 
         // 직접 service로 임의의 이메일 인증 번호 생성
-        String otp = otpService.generateAndSaveOTP("test@gmail.com");
+        int otp = otpService.generateAndSaveOTP("test@gmail.com");
 
         // then
         mvc.perform(MockMvcRequestBuilders.post(URI)

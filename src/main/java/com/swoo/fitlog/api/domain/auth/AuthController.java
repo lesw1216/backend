@@ -66,7 +66,7 @@ public class AuthController {
 
     @PostMapping("/api/v1/auth/locals/email/otp")
     public ResponseEntity<Object> certifyOtp(@RequestBody @Valid OtpDto otpDto) {
-        String otp = otpDto.getOtp();
+        int otp = otpDto.getOtp();
         String email = otpDto.getEmail();
 
         try {
