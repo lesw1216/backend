@@ -28,7 +28,7 @@ public class MailSendService {
         /*
         * 인증 번호 생성
         * */
-        String otp = otpService.generateAndSaveOTP(targetEmail);
+        int otp = otpService.generateAndSaveOTP(targetEmail);
         helper.setText("인증 번호: " + otp);
 
         mailSender.send(message);
