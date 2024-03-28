@@ -6,6 +6,7 @@ import com.swoo.fitlog.api.domain.auth.service.MailSendService;
 import com.swoo.fitlog.api.domain.auth.service.OtpService;
 import com.swoo.fitlog.api.domain.auth.service.PasswordAuthService;
 import com.swoo.fitlog.api.domain.user.dto.UserDto;
+import com.swoo.fitlog.api.domain.utils.ErrorCode;
 import com.swoo.fitlog.api.exception.ExpiredOtpException;
 import com.swoo.fitlog.api.http.ErrorResponse;
 import com.swoo.fitlog.api.http.RestResponse;
@@ -17,7 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Set;
 
 
 @Slf4j
@@ -71,16 +72,24 @@ public class AuthController {
         try {
             // 일치하지 않는 인증 번호
             if (!otpService.verifyOTP(email, otp)) {
-                ErrorResponse errorResponse = ErrorResponse
-                        .of(400, HttpStatus.BAD_REQUEST, "예기치 않은 오류가 발생했습니다.", List.of(70));
+                ErrorResponse errorResponse = ErrorResponse.of(
+                        400,
+                        HttpStatus.BAD_REQUEST,
+                        "예기치 않은 오류가 발생했습니다.",
+                        Set.of(ErrorCode.OTP_NOT_AGREEMENT)
+                );
 
                 return new ResponseEntity<>(errorResponse, errorResponse.getHttpStatus());
             }
 
         } catch (ExpiredOtpException e) {
             // 만료된 인증 번호
-            ErrorResponse errorResponse = ErrorResponse
-                    .of(400, HttpStatus.BAD_REQUEST, "예기치 않은 오류가 발생했습니다.", List.of(71));
+            ErrorResponse errorResponse = ErrorResponse.of(
+                    400,
+                    HttpStatus.BAD_REQUEST,
+                    "예기치 않은 오류가 발생했습니다.",
+                    Set.of(ErrorCode.OTP_EXPIRED_TIME)
+            );
 
             return new ResponseEntity<>(errorResponse, errorResponse.getHttpStatus());
         }
